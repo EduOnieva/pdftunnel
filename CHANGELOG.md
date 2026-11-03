@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1 - 2026-11-03
 
 ### Changed
 - The image takes cloudflared from `cloudflare/cloudflared:latest` instead of a pinned tag, so
