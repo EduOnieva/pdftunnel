@@ -73,12 +73,9 @@ Release workflow publishes images on pushes to `main` and `develop` and on tags:
 
 Images go to Docker Hub and GHCR for amd64 and arm64, with provenance and an SBOM. The
 runtime image is Alpine, upgraded at build time, with tini and tzdata, the locked virtualenv,
-and cloudflared copied from `cloudflare/cloudflared:<tag>`, where the tag is the build
-argument `CLOUDFLARED_TAG`. The workflows set it to what `scripts/cloudflared-tag.sh 14`
-prints: the newest release tag on Docker Hub that is at least 14 days old, a grace period
-matching Dependabot's cooldown; a local build defaults to `latest`. The Dockerfile pins
-everything else. pip and the other interpreter tooling are removed. To scan a build without
-mounting the
+and cloudflared copied from `cloudflare/cloudflared:latest`, so every build carries the newest
+cloudflared; the Dockerfile pins everything else. pip and the other interpreter tooling are
+removed. To scan a build without mounting the
 Docker socket:
 
 ```bash

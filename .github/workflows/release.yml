@@ -24,8 +24,6 @@ concurrency:
 env:
   IMAGE_DOCKERHUB: eduonieva/pdftunnel
   IMAGE_GHCR: ghcr.io/eduonieva/pdftunnel
-  # cloudflared releases younger than this are not bundled yet (see scripts/cloudflared-tag.sh)
-  CLOUDFLARED_GRACE_DAYS: 14
 
 jobs:
   publish:
@@ -43,13 +41,6 @@ jobs:
             tag="${GITHUB_REF_NAME#v}"
             [ "$tag" = "$version" ] || { echo "tag v$tag but pyproject.toml says $version"; exit 1; }
           fi
-
-      - id: cloudflared
-        name: the cloudflared release to bundle
-        run: |
-          tag=$(./scripts/cloudflared-tag.sh "$CLOUDFLARED_GRACE_DAYS")
-          echo "cloudflared $tag"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
@@ -83,7 +74,6 @@ jobs:
             org.opencontainers.image.title=pdftunnel
             org.opencontainers.image.description=Publish PDFs and other files from a folder through a Cloudflare Tunnel
             org.opencontainers.image.licenses=MIT
-            io.github.eduonieva.pdftunnel.cloudflared=${{ steps.cloudflared.outputs.tag }}
 
       - id: build
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
@@ -91,7 +81,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          build-args: CLOUDFLARED_TAG=${{ steps.cloudflared.outputs.tag }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: mode=max

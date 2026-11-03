@@ -3,9 +3,6 @@
 # Three stages: resolve the locked Python environment with uv, take cloudflared from its
 # official image, and copy both onto a slim runtime that runs as an unprivileged user.
 
-# Declared before the first stage so the cloudflared FROM below can use it
-ARG CLOUDFLARED_TAG=latest
-
 FROM python:3.13.18-alpine3.24 AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.13.6 /uv /bin/uv
 # UV_NO_BUILD: a dependency without a musl wheel fails the build here instead of compiling quietly
@@ -16,11 +13,10 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-ins
 COPY src ./src
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-editable
 
-# The static cloudflared binary, from the image Cloudflare publishes. The workflows pass the
-# newest release that has been out for at least 14 days (scripts/cloudflared-tag.sh), a grace
-# period like Dependabot's cooldown; a local build takes whatever is newest. The startup log
-# and /api/status report the version bundled
-FROM cloudflare/cloudflared:${CLOUDFLARED_TAG} AS cloudflared
+# The static cloudflared binary, from the image Cloudflare publishes. `latest` on purpose: every
+# build (each push, the Monday rebuild, a manual run of the Release workflow) bundles the newest
+# cloudflared, which the startup log and /api/status report
+FROM cloudflare/cloudflared:latest AS cloudflared
 
 FROM python:3.13.18-alpine3.24
 # apk upgrade: by the time of a weekly rebuild the base image is weeks old, and the musl or
