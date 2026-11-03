@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2 - 2026-11-03
+## Unreleased
 
 ### Changed
 - cloudflared is bundled with a grace period: each build takes the newest release that has
