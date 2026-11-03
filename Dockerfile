@@ -3,7 +3,7 @@
 # Three stages: resolve the locked Python environment with uv, take cloudflared from its
 # official image, and copy both onto a slim runtime that runs as an unprivileged user.
 
-FROM python:3.13.18-alpine3.24 AS builder
+FROM python:3.15.0-alpine3.24 AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.13.6 /uv /bin/uv
 # UV_NO_BUILD: a dependency without a musl wheel fails the build here instead of compiling quietly
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_NO_BUILD=1 UV_PROJECT_ENVIRONMENT=/opt/venv
@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-edi
 # The static cloudflared binary, from the image Cloudflare publishes; Dependabot bumps this tag
 FROM cloudflare/cloudflared:2026.10.7 AS cloudflared
 
-FROM python:3.13.18-alpine3.24
+FROM python:3.15.0-alpine3.24
 # pip, ensurepip, idle and pydoc never run here; pip's vendored packages are what image
 # scanners flag, so they leave with it
 RUN apk add --no-cache tini tzdata ca-certificates \
