@@ -23,16 +23,17 @@ routes:
     listing: true
 YAML
 chmod -R a+rwX "$WORK/config"
+# Every run as the caller's own user, the way the compose file's `user:` override does, so
+# what the container writes (config/state) is owned by the caller and can be cleaned up
+AS_ME="--user $(id -u):$(id -g)"
 
 echo "== --version, check-config, token"
-docker run --rm "$IMAGE" --version
-docker run --rm -v "$WORK/config:/config" "$IMAGE" check-config
-docker run --rm "$IMAGE" token | grep -Eq '^[a-z0-9]{12}$'
+docker run --rm $AS_ME "$IMAGE" --version
+docker run --rm $AS_ME -v "$WORK/config:/config" "$IMAGE" check-config
+docker run --rm $AS_ME "$IMAGE" token | grep -Eq '^[a-z0-9]{12}$'
 
 echo "== start"
-# As the caller's own user, the way the compose file's `user:` override runs it, so the state
-# the container writes can be cleaned up afterwards
-docker run -d --name "$NAME" --user "$(id -u):$(id -g)" \
+docker run -d --name "$NAME" $AS_ME \
   --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges:true \
   -v "$WORK/config:/config" \
   -e TUNNEL_TOKEN=bogus -e API_TOKEN=smoke -e WEB_BIND=0.0.0.0 -p 127.0.0.1::8080 \

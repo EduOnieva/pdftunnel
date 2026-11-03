@@ -137,7 +137,9 @@ def healthcheck(port: int) -> int:
         with urllib.request.urlopen(url, timeout=4) as response:
             body = response.read().decode("utf-8", "replace").strip()
     except urllib.error.HTTPError as exc:
-        print(f"unhealthy: {exc.read().decode('utf-8', 'replace').strip() or exc.code}")
+        with exc:
+            detail = exc.read().decode("utf-8", "replace").strip()
+        print(f"unhealthy: {detail or exc.code}")
         return 1
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         print(f"unhealthy: {exc}")
