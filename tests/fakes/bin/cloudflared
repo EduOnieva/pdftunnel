@@ -1,0 +1,29 @@
+#!/bin/sh
+# A stand-in for cloudflared. It prints the log lines the supervisor looks for and does what
+# FAKE_CLOUDFLARED_MODE says: connect (default), exit, crash-after-connect.
+# FAKE_CLOUDFLARED_LOG names a file that records how it was called.
+if [ -n "$FAKE_CLOUDFLARED_LOG" ]; then
+  echo "argv: $*" >> "$FAKE_CLOUDFLARED_LOG"
+  echo "token: $TUNNEL_TOKEN" >> "$FAKE_CLOUDFLARED_LOG"
+fi
+mode="${FAKE_CLOUDFLARED_MODE:-connect}"
+case "$mode" in
+  exit)
+    echo "2026-01-01T00:00:00Z ERR Provided Tunnel token is not valid."
+    exit 1
+    ;;
+  crash-after-connect)
+    echo "2026-01-01T00:00:00Z INF Registered tunnel connection connIndex=0 location=mad01"
+    sleep 0.2
+    echo "2026-01-01T00:00:00Z ERR Lost connection with the edge"
+    exit 2
+    ;;
+  *)
+    trap 'echo "2026-01-01T00:00:00Z INF Unregistered tunnel connection connIndex=0"; exit 0' TERM INT
+    echo "2026-01-01T00:00:00Z INF Starting tunnel"
+    echo "2026-01-01T00:00:00Z WRN Cannot determine default configuration path"
+    echo "2026-01-01T00:00:00Z INF Registered tunnel connection connIndex=0 location=mad01"
+    echo "2026-01-01T00:00:00Z INF Registered tunnel connection connIndex=1 location=mad02"
+    while :; do sleep 0.1; done
+    ;;
+esac

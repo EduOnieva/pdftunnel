@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+{% if entries %}
+<ul class="files">
+  {% for e in entries %}
+  <li>
+    <a href="{{ e.href }}">{{ e.label }}</a>
+    {% if e.access %}<span class="badge" title="Needs a login">login</span>{% endif %}
+    {% if e.size %}<span class="meta">{{ e.size }} · {{ e.modified }}</span>{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">Nothing published yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+{% if entries %}
+<ul class="files">
+  {% for e in entries %}
+  <li>
+    <a href="{{ e.href }}">{{ e.label }}</a>
+    <span class="meta">{{ e.size }} · {{ e.modified }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">This folder is empty.</p>
+{% endif %}
+{% endblock %}
