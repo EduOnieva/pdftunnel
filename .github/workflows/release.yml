@@ -75,7 +75,8 @@ jobs:
             org.opencontainers.image.description=Publish PDFs and other files from a folder through a Cloudflare Tunnel
             org.opencontainers.image.licenses=MIT
 
-      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+      - id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -89,6 +90,32 @@ jobs:
           no-cache: ${{ github.event_name != 'push' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # The VEX statement in .vex/ names the published image: every tag just pushed and the
+      # digest, so Docker Scout matches it whichever reference it analyses. Attaching it is
+      # experimental on Scout's side, so a failure here never fails the release
+      - id: vex
+        name: VEX statement for the published tags
+        run: |
+          jq --arg digest "${{ steps.build.outputs.digest }}" --rawfile tags <(printf '%s\n' "${{ steps.meta.outputs.tags }}") '
+            (($tags | split("\n") | map(select(length > 0))
+              | map(if startswith("ghcr.io/") then (ltrimstr("ghcr.io/") | split(":") | "pkg:docker/\(.[0])@\(.[1])?repository_url=ghcr.io")
+                    else (split(":") | "pkg:docker/\(.[0])@\(.[1])") end)
+            ) + ["pkg:docker/eduonieva/pdftunnel@\($digest)"]) as $ids
+            | .statements[0].products = ($ids | map({"@id": ., "subcomponents": [{"@id": "pkg:golang/github.com/cloudflare/cloudflared"}]}))
+            | .timestamp = (now | todate)
+          ' .vex/cloudflared.vex.json > /tmp/pdftunnel.vex.json
+          jq -r '.statements[0].products[]["@id"]' /tmp/pdftunnel.vex.json
+      - name: Attach the VEX statement to the image
+        continue-on-error: true
+        uses: docker/scout-action@e7e2a72bf1485d10a58f30696b6c513b261ce4fa # v1.29.0
+        with:
+          command: attestation-add
+          image: ${{ env.IMAGE_DOCKERHUB }}@${{ steps.build.outputs.digest }}
+          file: /tmp/pdftunnel.vex.json
+          predicate-type: https://openvex.dev/ns/v0.2.0
+          dockerhub-user: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # Needs a Docker Hub token with read, write and delete scope; a read/write one gets a 403.
       # The image is already published by then, so a failure here never fails the release.

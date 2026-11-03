@@ -5,4 +5,5 @@
 !README.md
 !LICENSE
 !src/
+!.vex/
 src/**/__pycache__/

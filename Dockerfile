@@ -33,6 +33,10 @@ RUN apk upgrade --no-cache \
     && mkdir -p /config && chown pdftunnel:pdftunnel /config
 COPY --from=cloudflared /usr/local/bin/cloudflared /usr/local/bin/cloudflared
 COPY --from=builder /opt/venv /opt/venv
+# The VEX statement for the advisory scanners misattribute to cloudflared (see .vex/). Read
+# from here by scanners for a local build; the published images carry it as an attestation,
+# since an image with SBOM and provenance attestations is only read for those
+COPY .vex/cloudflared.vex.json /var/lib/db/cloudflared.vex.json
 ENV PATH=/opt/venv/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \

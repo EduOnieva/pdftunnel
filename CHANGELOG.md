@@ -9,6 +9,11 @@
   say which one is running.
 - The Alpine packages of the base image are upgraded at build time.
 - Dependabot no longer proposes a new minor or major of the Python base image.
+- A VEX statement (`.vex/cloudflared.vex.json`) declares CVE-2020-24356 not applicable: the
+  advisory is a Windows-only issue fixed in cloudflared 2020.8.1, matched only because
+  Cloudflare's build embeds a v0.0.0 pseudo-version. The statement ships inside the image and
+  is attached to the published images as an attestation, so Docker Scout files it as an
+  exception.
 
 ## 1.0 - 2026-11-03
 

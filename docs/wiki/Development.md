@@ -86,6 +86,19 @@ docker run --rm -v /tmp:/scan:ro aquasec/trivy image --input /scan/pdftunnel.tar
 Actions are pinned to commit SHAs; Dependabot keeps them, the Python lock file and the base
 images current, grouped, with a 14-day cooldown after a release.
 
+### Scanner findings in cloudflared
+
+Scanners read the Go module list inside the cloudflared binary. Two things follow. Advisories
+against `golang.org/x/...` modules are real pending updates that only Cloudflare can ship by
+building a new release, which the next image build picks up. And CVE-2020-24356, a Windows-only
+issue fixed in 2020.8.1, is matched on every build because Cloudflare embeds a `v0.0.0`
+pseudo-version in the binary. `.vex/cloudflared.vex.json` is the OpenVEX statement that
+declares it not applicable; the Dockerfile copies it into the image for local scans, and the
+Release workflow rewrites its product list with the tags and digest just pushed and attaches
+it as an attestation, which is where Docker Scout looks once an image carries SBOM and
+provenance attestations. A new finding of the same kind gets a new statement in that file,
+with its justification written out.
+
 ## Branches and releases
 
 Work happens on `develop`. `wip` is the scratch branch ahead of it. A release:
