@@ -102,7 +102,7 @@ jobs:
               | map(if startswith("ghcr.io/") then (ltrimstr("ghcr.io/") | split(":") | "pkg:docker/\(.[0])@\(.[1])?repository_url=ghcr.io")
                     else (split(":") | "pkg:docker/\(.[0])@\(.[1])") end)
             ) + ["pkg:docker/eduonieva/pdftunnel@\($digest)"]) as $ids
-            | .statements[0].products = ($ids | map({"@id": ., "subcomponents": [{"@id": "pkg:golang/github.com/cloudflare/cloudflared"}]}))
+            | .statements[0].products = ($ids | map({"@id": .}))
             | .timestamp = (now | todate)
           ' .vex/cloudflared.vex.json > /tmp/pdftunnel.vex.json
           jq -r '.statements[0].products[]["@id"]' /tmp/pdftunnel.vex.json

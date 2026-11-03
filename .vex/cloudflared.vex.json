@@ -4,23 +4,25 @@
   "author": "Eduardo Onieva",
   "role": "maintainer",
   "timestamp": "2026-11-03T12:00:00Z",
-  "version": 1,
+  "version": 2,
   "statements": [
     {
       "vulnerability": {
         "name": "CVE-2020-24356",
-        "aliases": ["GHSA-hgwp-4vp4-qmm2", "GO-2022-0845"],
+        "aliases": [
+          "GHSA-hgwp-4vp4-qmm2",
+          "GO-2022-0845"
+        ],
         "description": "cloudflared before 2020.8.1: local privilege escalation on Windows"
       },
       "products": [
         {
-          "@id": "pkg:docker/eduonieva/pdftunnel",
-          "subcomponents": [{ "@id": "pkg:golang/github.com/cloudflare/cloudflared" }]
+          "@id": "pkg:docker/eduonieva/pdftunnel"
         }
       ],
       "status": "not_affected",
       "justification": "vulnerable_code_not_present",
-      "impact_statement": "The image bundles the cloudflared release current at build time (2026.10.7 or newer), years past the fix in 2020.8.1; scanners match the advisory because Cloudflare's build embeds a v0.0.0 pseudo-version in the binary. The advisory also concerns Windows only, and this is a Linux image.",
+      "impact_statement": "The image bundles the cloudflared release current at build time (2026.10.7 or newer), years past the fix in 2020.8.1; scanners match the advisory because Cloudflare's build embeds a v0.0.0 pseudo-version in the binary. The advisory also concerns Windows only, and this is a Linux image. cloudflared is the only Go binary in the image, so the statement covers the image as a whole.",
       "action_statement": "None needed. The Release workflow attaches this statement to every published image."
     }
   ]
