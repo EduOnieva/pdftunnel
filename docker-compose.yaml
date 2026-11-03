@@ -1,0 +1,40 @@
+# pdftunnel: publish PDFs and other files from ./config/files through a Cloudflare Tunnel.
+#
+# 1. Create the tunnel in Zero Trust (Networks > Tunnels), give it a public hostname whose
+#    service is http://localhost:8080, and copy its token.
+# 2. Put the token in a .env file next to this one: TUNNEL_TOKEN=eyJ...
+# 3. mkdir -p config/files, drop the files there, docker compose up -d, then edit
+#    config/config.yaml (a commented example is written on first start; edits are picked up
+#    while running).
+#
+# Nothing is published on this host: only cloudflared, inside the container, reaches the
+# server. The container runs as an unprivileged user (uid 1000), read-only, with every
+# capability dropped.
+services:
+  pdftunnel:
+    image: eduonieva/pdftunnel:latest
+    container_name: pdftunnel
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs:
+      - /tmp
+    # The container's user must be able to read ./config and write config/state. Create the
+    # folder as yourself before the first start, or match your own ids here:
+    # user: "1000:1000"
+    volumes:
+      - ./config:/config
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+      - TZ=Etc/UTC
+      # - API_TOKEN=            # enables /api/status for dashboards (bearer token)
+      # - LOG_LEVEL=INFO
+      # A value in environment: is readable by anyone who can run docker inspect. To keep the
+      # token in a file instead, mount it and name it: FILE__TUNNEL_TOKEN=/run/secrets/tunnel_token
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
