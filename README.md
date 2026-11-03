@@ -198,10 +198,12 @@ Homepage and Home Assistant.
   newest; `develop` is the `develop` branch. On Docker Hub (`eduonieva/pdftunnel`) and GHCR
   (`ghcr.io/eduonieva/pdftunnel`), for amd64 and arm64. The release tags are rebuilt every
   Monday from the same code, so fixes in the Python base image and Alpine packages arrive with
-  a `pull`, and so does the newest cloudflared, which every build takes from Cloudflare's own
-  image. To update cloudflared on a day other than Monday, run the *Release* workflow by hand
-  in the repository's *Actions* tab, then `pull`. The startup log and `/api/status` say which
-  cloudflared version is running.
+  a `pull`, and so does cloudflared: each build bundles the newest release that has been out
+  for at least 14 days, the same grace period Dependabot applies to everything else, so a
+  release that is pulled or found compromised in its first days never reaches an image. To
+  rebuild on a day other than Monday, run the *Release* workflow by hand in the repository's
+  *Actions* tab, then `pull`. The startup log and `/api/status` say which cloudflared version
+  is running.
 - **CLI.** `docker exec pdftunnel pdftunnel check-config | print-config |
   print-example-config | token [--length N] | healthcheck`.
 - **Something wrong.** The wiki's

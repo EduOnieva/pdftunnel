@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- cloudflared is bundled with a grace period: each build takes the newest release that has
+  been on Docker Hub for at least 14 days, chosen by `scripts/cloudflared-tag.sh`, instead of
+  `latest`. A release pulled or replaced in its first days never reaches an image. The
+  version is also in the image label `io.github.eduonieva.pdftunnel.cloudflared`.
+
 ## 1.1 - 2026-11-03
 
 ### Changed
