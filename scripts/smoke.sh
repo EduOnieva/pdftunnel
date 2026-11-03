@@ -74,7 +74,12 @@ grep -q '"path": *"/"' <<<"$STATUS" || fail "routes in status"
 docker exec "$NAME" pdftunnel healthcheck && fail "healthcheck should fail" || true
 
 echo "== restart loop is running"
-docker logs "$NAME" 2>&1 | grep -q 'restarting in' || fail "no restart line in the log"
+# cloudflared exits only after Cloudflare's API has rejected the bogus token, so give it time
+for _ in $(seq 1 60); do
+  docker logs "$NAME" 2>&1 | grep -q 'restarting in' && break
+  sleep 0.5
+done
+docker logs "$NAME" 2>&1 | grep -q 'restarting in' || fail "no restart line in the log after 30s"
 
 echo "== stop"
 docker stop -t 15 "$NAME" >/dev/null
