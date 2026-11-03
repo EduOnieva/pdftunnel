@@ -93,13 +93,11 @@ token, which is why it verifies the token itself).
 `docker compose pull && docker compose up -d` updates. The release tags are rebuilt every
 Monday from the same code, so fixes in the Python base image and the Alpine packages arrive
 without a new version, and so does cloudflared: every build copies, from Cloudflare's own
-image, the newest release that has been on Docker Hub for at least 7 days. That grace
+image, the newest release that has been on Docker Hub for at least 14 days. That grace
 period is deliberate: a release that turns out to be broken or compromised is usually pulled
 within days, and a tag that is quietly replaced gets a new date on Docker Hub and waits
-again. It is shorter than the 14 days Dependabot waits for everything else because the wait
-also delays the fixes Cloudflare ships in cloudflared's own dependencies; a week is the
-balance chosen. Cloudflare publishes cloudflared about monthly, so an image is at most a
-couple of weeks behind. To rebuild before Monday, open the repository's *Actions* tab, choose *Release*,
+again. Cloudflare publishes cloudflared about monthly, so an image is at most a few weeks
+behind. To rebuild before Monday, open the repository's *Actions* tab, choose *Release*,
 *Run workflow* on `main`, wait a few minutes and `pull`. `docker logs pdftunnel | head -1`
 and `/api/status` name the cloudflared version in use, and the image label
 `io.github.eduonieva.pdftunnel.cloudflared` carries it too. Images are published for amd64

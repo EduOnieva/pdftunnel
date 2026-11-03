@@ -25,7 +25,7 @@ env:
   IMAGE_DOCKERHUB: eduonieva/pdftunnel
   IMAGE_GHCR: ghcr.io/eduonieva/pdftunnel
   # cloudflared releases younger than this are not bundled yet (see scripts/cloudflared-tag.sh)
-  CLOUDFLARED_GRACE_DAYS: 7
+  CLOUDFLARED_GRACE_DAYS: 14
 
 jobs:
   publish:

@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # Print the newest cloudflared release tag that has been on Docker Hub for at least N days
-# (default 7): a grace period in the spirit of Dependabot's cooldown, so a release that turns
-# out to be broken or compromised is usually pulled before it reaches an image. A tag pushed
-# again gets a new date on Docker Hub, so a silently replaced release waits too. Shorter than
-# Dependabot's 14 days because cloudflared's own fixes wait the same time.
+# (default 14): a grace period, like Dependabot's cooldown, so a release that turns out to be
+# compromised or broken is usually pulled before it reaches an image. A tag pushed again gets
+# a new date on Docker Hub, so a silently replaced release waits too.
 set -euo pipefail
 
-DAYS="${1:-7}"
+DAYS="${1:-14}"
 API="https://hub.docker.com/v2/repositories/cloudflare/cloudflared/tags?page_size=100&ordering=last_updated"
 
 curl -fsS "$API" | python3 -c '

@@ -17,8 +17,8 @@ COPY src ./src
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-editable
 
 # The static cloudflared binary, from the image Cloudflare publishes. The workflows pass the
-# newest release that has been out for at least 7 days (scripts/cloudflared-tag.sh), a grace
-# period in the spirit of Dependabot's cooldown; a local build takes whatever is newest. The startup log
+# newest release that has been out for at least 14 days (scripts/cloudflared-tag.sh), a grace
+# period like Dependabot's cooldown; a local build takes whatever is newest. The startup log
 # and /api/status report the version bundled
 FROM cloudflare/cloudflared:${CLOUDFLARED_TAG} AS cloudflared
 

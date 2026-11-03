@@ -199,9 +199,8 @@ Homepage and Home Assistant.
   (`ghcr.io/eduonieva/pdftunnel`), for amd64 and arm64. The release tags are rebuilt every
   Monday from the same code, so fixes in the Python base image and Alpine packages arrive with
   a `pull`, and so does cloudflared: each build bundles the newest release that has been out
-  for at least 7 days, a grace period so that a release pulled or found compromised in its
-  first days never reaches an image, short enough that cloudflared's own fixes are not held
-  back for long. To
+  for at least 14 days, the same grace period Dependabot applies to everything else, so a
+  release that is pulled or found compromised in its first days never reaches an image. To
   rebuild on a day other than Monday, run the *Release* workflow by hand in the repository's
   *Actions* tab, then `pull`. The startup log and `/api/status` say which cloudflared version
   is running.
