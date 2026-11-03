@@ -88,7 +88,9 @@ class Route(BaseModel):
         if value is None:
             return None
         if not value.strip() or _FILENAME_FORBIDDEN.search(value):
-            raise ValueError("must be a plain file name without slashes, quotes or control characters")
+            raise ValueError(
+                "must be a plain file name without slashes, quotes or control characters"
+            )
         return value.strip()
 
     @model_validator(mode="after")

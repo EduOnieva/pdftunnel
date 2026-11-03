@@ -7,7 +7,7 @@ set -euo pipefail
 IMAGE="${1:-pdftunnel:dev}"
 NAME="pdftunnel-smoke-$$"
 WORK="$(mktemp -d)"
-trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
+trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true; rm -rf "$WORK" 2>/dev/null || true' EXIT
 
 mkdir -p "$WORK/config/files/docs"
 printf '%%PDF-1.4\n%%%%EOF\n' > "$WORK/config/files/catalogue.pdf"
@@ -30,7 +30,9 @@ docker run --rm -v "$WORK/config:/config" "$IMAGE" check-config
 docker run --rm "$IMAGE" token | grep -Eq '^[a-z0-9]{12}$'
 
 echo "== start"
-docker run -d --name "$NAME" \
+# As the caller's own user, the way the compose file's `user:` override runs it, so the state
+# the container writes can be cleaned up afterwards
+docker run -d --name "$NAME" --user "$(id -u):$(id -g)" \
   --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges:true \
   -v "$WORK/config:/config" \
   -e TUNNEL_TOKEN=bogus -e API_TOKEN=smoke -e WEB_BIND=0.0.0.0 -p 127.0.0.1::8080 \
