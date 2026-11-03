@@ -32,3 +32,7 @@ updates:
     groups:
       images:
         patterns: ["*"]
+    ignore:
+      # The image ships Python 3.13; a new minor or major is a decision, not an update
+      - dependency-name: python
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
