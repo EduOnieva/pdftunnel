@@ -22,4 +22,4 @@ htmlcov/
 
 # Local deployment: the real token and the published files never enter the repo
 .env
-config/
+/config/
