@@ -29,6 +29,7 @@ async def test_status_with_bearer(client, deps):
     body = response.json()
     assert body["version"] == "test"
     assert body["tunnel"]["state"] == "connected" and body["tunnel"]["connections"] == 2
+    assert body["tunnel"]["cloudflared_version"] == "2026.10.7"
     assert body["tunnel"]["connected_since"] == "2026-01-01T00:00:00+00:00"
     assert body["config"] == {"routes": 7, "index": True, "access_configured": True, "error": None}
     routes = {r["path"]: r for r in body["routes"]}

@@ -24,6 +24,7 @@ class FakeTunnel:
             last_exit_code=None,
             last_error=None,
             connected_since=datetime(2026, 1, 1, tzinfo=UTC) if connected else None,
+            version="2026.10.7",
         )
 
 

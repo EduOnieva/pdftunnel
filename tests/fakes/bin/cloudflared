@@ -2,6 +2,10 @@
 # A stand-in for cloudflared. It prints the log lines the supervisor looks for and does what
 # FAKE_CLOUDFLARED_MODE says: connect (default), exit, crash-after-connect.
 # FAKE_CLOUDFLARED_LOG names a file that records how it was called.
+if [ "$1" = "--version" ]; then
+  echo "cloudflared version 2026.10.7 (built 2026-10-30-17:17 UTC)"
+  exit 0
+fi
 if [ -n "$FAKE_CLOUDFLARED_LOG" ]; then
   echo "argv: $*" >> "$FAKE_CLOUDFLARED_LOG"
   echo "token: $TUNNEL_TOKEN" >> "$FAKE_CLOUDFLARED_LOG"

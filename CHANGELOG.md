@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- The image takes cloudflared from `cloudflare/cloudflared:latest` instead of a pinned tag, so
+  every build, the Monday rebuild and a manual run of the Release workflow included, bundles
+  the newest cloudflared. The startup log and `/api/status` (`tunnel.cloudflared_version`)
+  say which one is running.
+- The Alpine packages of the base image are upgraded at build time.
+- Dependabot no longer proposes a new minor or major of the Python base image.
+
 ## 1.0 - 2026-11-03
 
 The first release. A rewrite of a one-file nginx and cloudflared container into a tool.

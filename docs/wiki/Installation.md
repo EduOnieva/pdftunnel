@@ -92,8 +92,12 @@ token, which is why it verifies the token itself).
 
 `docker compose pull && docker compose up -d` updates. The release tags are rebuilt every
 Monday from the same code, so fixes in the Python base image and the Alpine packages arrive
-without a new version; cloudflared is copied from Cloudflare's own image, bumped by
-Dependabot and shipped with the next release. Images are published for amd64 and arm64, on
+without a new version, and so does cloudflared: every build copies the newest release from
+Cloudflare's own image (`cloudflare/cloudflared:latest`). Cloudflare publishes cloudflared
+about monthly; to pick a release up before Monday, open the repository's *Actions* tab,
+choose *Release*, *Run workflow* on `main`, wait a few minutes and `pull`. `docker logs
+pdftunnel | head -1` and `/api/status` name the cloudflared version in use. Images are
+published for amd64 and arm64, on
 Docker Hub (`eduonieva/pdftunnel`) and GHCR (`ghcr.io/eduonieva/pdftunnel`), with provenance
 and an SBOM.
 

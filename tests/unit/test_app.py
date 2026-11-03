@@ -104,6 +104,8 @@ async def test_run_serves_reloads_and_stops_on_sigterm(paths, monkeypatch, caplo
     async with asyncio.timeout(10):
         assert await task == 0
     assert "Stopping cloudflared" in caplog.text and "Stopped" in caplog.text
+    assert "with cloudflared 2026.10.7" in caplog.text
+    assert status["tunnel"]["cloudflared_version"] == "2026.10.7"
     assert json.loads(paths.counters_file.read_text()) == {"/": 1, "/docs/": 2}
 
 

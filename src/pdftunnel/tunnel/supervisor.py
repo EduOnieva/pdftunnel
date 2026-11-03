@@ -43,6 +43,7 @@ class TunnelStatus:
     last_exit_code: int | None
     last_error: str | None
     connected_since: datetime | None
+    version: str | None = None  # cloudflared's, once read
 
 
 SleepFn = Callable[[float], Awaitable[None]]
@@ -68,6 +69,7 @@ class TunnelSupervisor:
         self._last_exit_code: int | None = None
         self._last_error: str | None = None
         self._connected_since: datetime | None = None
+        self._version: str | None = None
         self._stop = asyncio.Event()
         self._connected_event = asyncio.Event()
 
@@ -80,11 +82,35 @@ class TunnelSupervisor:
             last_exit_code=self._last_exit_code,
             last_error=self._last_error,
             connected_since=self._connected_since,
+            version=self._version,
         )
 
     @property
     def healthy(self) -> bool:
         return self._state is TunnelState.CONNECTED
+
+    @property
+    def version(self) -> str | None:
+        """cloudflared's version, once `read_version` has run."""
+        return self._version
+
+    async def read_version(self) -> str | None:
+        """Ask the binary for its version: `cloudflared version 2026.10.7 (built ...)`."""
+        try:
+            process = await asyncio.create_subprocess_exec(
+                str(self._binary),
+                "--version",
+                stdin=asyncio.subprocess.DEVNULL,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
+            )
+            output, _ = await asyncio.wait_for(process.communicate(), 10)
+        except (OSError, TimeoutError) as exc:
+            log.warning("Cannot read the cloudflared version: %s", exc)
+            return None
+        words = output.decode("utf-8", "replace").split()
+        self._version = words[2] if len(words) >= 3 and words[1] == "version" else None
+        return self._version
 
     async def wait_connected(self) -> None:
         """Returns once a connection has registered; wrap it in `asyncio.timeout`."""

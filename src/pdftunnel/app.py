@@ -108,6 +108,7 @@ class Application:
         counters = Counters(self.paths.counters_file)
         counters.load()
         supervisor = TunnelSupervisor(env.cloudflared_bin, env.tunnel_token)
+        cloudflared_version = await supervisor.read_version()
         if env.api_token is None and not config.access.is_configured:
             log.info("Status API off: set API_TOKEN to enable /api/status")
 
@@ -133,8 +134,9 @@ class Application:
             )
         )
         log.info(
-            "pdftunnel %s serving %d route(s) on %s:%d, config %s",
+            "pdftunnel %s with cloudflared %s, serving %d route(s) on %s:%d, config %s",
             __version__,
+            cloudflared_version or "(unknown version)",
             len(config.routes),
             env.web_bind,
             env.web_port,

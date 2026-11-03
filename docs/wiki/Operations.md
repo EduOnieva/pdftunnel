@@ -40,7 +40,9 @@ them. To reset, stop the container and delete the file.
 
 ## The tunnel
 
-cloudflared runs as a child of the application. If it exits (a revoked token, a network
+cloudflared runs as a child of the application. Its version is in the first line of the log
+and in `/api/status`; a rebuilt image carries the newest one (see *Image tags and updating*
+in [[Installation]]). If it exits (a revoked token, a network
 change it did not recover from), the application logs the exit code, waits 1, 2, 5, 10 and
 then 30 seconds between attempts, and starts it again; `/healthz` says 503 and `/api/status`
 carries `restarts`, `last_exit_code` and `last_error` meanwhile. `docker stop` sends SIGTERM:

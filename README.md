@@ -177,7 +177,7 @@ A file behind Access is always sent with `Cache-Control: private, no-store`, wha
 | Endpoint | What it does |
 |---|---|
 | `GET /healthz` | 200 while the tunnel is connected, 503 with the state otherwise (Docker's HEALTHCHECK) |
-| `GET /api/status` | Version, tunnel state and connections, every route with size, date, existence and open count; needs `Authorization: Bearer <API_TOKEN>` or a Cloudflare Access login |
+| `GET /api/status` | Version, cloudflared version, tunnel state and connections, every route with size, date, existence and open count; needs `Authorization: Bearer <API_TOKEN>` or a Cloudflare Access login |
 | `GET /` | The index page when `site.index` is on and `/` is not a route |
 | `GET /_pdftunnel/app.css` | The pages' stylesheet; `custom.css` in the config folder is loaded after it |
 
@@ -198,7 +198,10 @@ Homepage and Home Assistant.
   newest; `develop` is the `develop` branch. On Docker Hub (`eduonieva/pdftunnel`) and GHCR
   (`ghcr.io/eduonieva/pdftunnel`), for amd64 and arm64. The release tags are rebuilt every
   Monday from the same code, so fixes in the Python base image and Alpine packages arrive with
-  a `pull`; cloudflared is taken from its official image and bumped by Dependabot.
+  a `pull`, and so does the newest cloudflared, which every build takes from Cloudflare's own
+  image. To update cloudflared on a day other than Monday, run the *Release* workflow by hand
+  in the repository's *Actions* tab, then `pull`. The startup log and `/api/status` say which
+  cloudflared version is running.
 - **CLI.** `docker exec pdftunnel pdftunnel check-config | print-config |
   print-example-config | token [--length N] | healthcheck`.
 - **Something wrong.** The wiki's

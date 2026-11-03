@@ -75,6 +75,7 @@ def status_payload(deps: WebDeps) -> dict[str, Any]:
     return {
         "version": deps.version,
         "tunnel": {
+            "cloudflared_version": tunnel.version,
             "state": tunnel.state.value,
             "connections": tunnel.connections,
             "restarts": tunnel.restarts,

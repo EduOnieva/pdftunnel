@@ -136,3 +136,22 @@ def test_line_parsing_levels_and_unregister(caplog):
     assert status.last_error == "2026 ERR something bad"
     levels = [r.levelname for r in caplog.records if r.name == "cloudflared"]
     assert "DEBUG" in levels and "ERROR" in levels
+
+
+async def test_read_version():
+    supervisor = TunnelSupervisor(BIN, SecretStr("x"))
+    before = supervisor.status
+    assert before.version is None
+    assert await supervisor.read_version() == "2026.10.7"
+    after = supervisor.status
+    assert after.version == "2026.10.7" and supervisor.version == "2026.10.7"
+
+
+async def test_read_version_failures(tmp_path, caplog):
+    with caplog.at_level(logging.WARNING):
+        assert await TunnelSupervisor(tmp_path / "nope", SecretStr("x")).read_version() is None
+    assert "Cannot read the cloudflared version" in caplog.text
+    odd = tmp_path / "odd"
+    odd.write_text("#!/bin/sh\necho 'something else'\n")
+    odd.chmod(0o755)
+    assert await TunnelSupervisor(odd, SecretStr("x")).read_version() is None

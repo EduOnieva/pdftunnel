@@ -72,9 +72,10 @@ Release workflow publishes images on pushes to `main` and `develop` and on tags:
 | every Monday, and on demand | `latest`, `X.Y` and `X` rebuilt from `main` without the layer cache |
 
 Images go to Docker Hub and GHCR for amd64 and arm64, with provenance and an SBOM. The
-runtime image is Alpine with tini and tzdata, the locked virtualenv, and cloudflared copied
-from `cloudflare/cloudflared:<version>`, a stage of the Dockerfile that Dependabot bumps.
-pip and the other interpreter tooling are removed. To scan a build without mounting the
+runtime image is Alpine, upgraded at build time, with tini and tzdata, the locked virtualenv,
+and cloudflared copied from `cloudflare/cloudflared:latest`, so every build carries the newest
+cloudflared; the Dockerfile pins everything else. pip and the other interpreter tooling are
+removed. To scan a build without mounting the
 Docker socket:
 
 ```bash

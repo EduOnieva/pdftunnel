@@ -13,13 +13,17 @@ RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-ins
 COPY src ./src
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-editable
 
-# The static cloudflared binary, from the image Cloudflare publishes; Dependabot bumps this tag
-FROM cloudflare/cloudflared:2026.10.7 AS cloudflared
+# The static cloudflared binary, from the image Cloudflare publishes. `latest` on purpose: every
+# build (each push, the Monday rebuild, a manual run of the Release workflow) bundles the newest
+# cloudflared, which the startup log and /api/status report
+FROM cloudflare/cloudflared:latest AS cloudflared
 
 FROM python:3.13.18-alpine3.24
-# pip, ensurepip, idle and pydoc never run here; pip's vendored packages are what image
-# scanners flag, so they leave with it
-RUN apk add --no-cache tini tzdata ca-certificates \
+# apk upgrade: by the time of a weekly rebuild the base image is weeks old, and the musl or
+# ssl fix Alpine shipped since is the point of rebuilding. pip, ensurepip, idle and pydoc
+# never run here; pip's vendored packages are what image scanners flag, so they leave with it
+RUN apk upgrade --no-cache \
+    && apk add --no-cache tini tzdata ca-certificates \
     && rm -rf /usr/local/lib/python3.13/site-packages/pip* \
               /usr/local/lib/python3.13/ensurepip \
               /usr/local/lib/python3.13/idlelib \

@@ -23,6 +23,7 @@ curl -H "Authorization: Bearer $API_TOKEN" https://docs.example.com/api/status
 {
   "version": "1.0",
   "tunnel": {
+    "cloudflared_version": "2026.10.7",
     "state": "connected",
     "connections": 2,
     "restarts": 0,
